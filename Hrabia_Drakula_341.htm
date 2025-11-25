@@ -2,6 +2,17 @@
 <html lang="pl">
   <head>
     <meta charset="UTF-8">
+
+    <!-- ***** Robots tag with attribution section STARTS ***** -->
+    <!--
+    Source - https://stackoverflow.com/questions/67192771/what-is-the-impact-of-a-meta-tag-with-content-noindex-nofollow
+    Specific post: https://stackoverflow.com/a/78564852
+    Posted by Kapilraj Parameswararajah
+    Retrieved 2025-11-25, License - CC BY-SA 4.0
+    -->
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <!-- ***** Robots tag with attribution section ENDS ***** -->
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="https://context.reverso.net/translation/polish-english/">
     <title>Opowieść 341 | Hrabia Drakula</title>
@@ -17,39 +28,40 @@
     </style>
     <script>
       function toggleHeading() {
-        const heading = document.querySelector('h1');
+        const heading = document.getElementById('toggleThis');
         heading.classList.toggle('hidden');
       }
-      
       function setDarkMode() {
         document.body.style.backgroundColor = 'black';
         document.body.style.color = 'white';
       }
-      
       function setLightMode() {
         document.body.style.backgroundColor = 'white';
         document.body.style.color = 'black';
       }
-      
       function adjustFontSize(direction) {
         const elements = document.querySelectorAll('h1, li, button');
         const change = direction === '+' ? 2 : -2;
         
-        console.log('Adjusting font size:', direction);
+        console.log('Adjusting font sizes:', direction);
         elements.forEach(el => {
-          console.log('----- ' + el.tagName.toLowerCase() + ' -----');
           let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
-          console.log('Current size:', currentSize);
           let newSize = currentSize + change;
           if (newSize < 6) newSize = 6;
-          console.log('New size:', newSize);
           el.style.fontSize = newSize + 'px';
+          console.log('Tag: ' + el.tagName.toLowerCase() + '. currentSize: ' + currentSize + '. newSize: ' + newSize + '.')
         });
+        console.log('Adjusted font sizes.');
       }
     </script>
   </head>
   <body>
-    <h1>Opowieść 341 | Hrabia Drakula</h1>
+    <div id="toggleThis">
+      <h1>Opowieść 341 | Hrabia Drakula</h1><br>
+      <h2>
+        <!-- Investigate: https://www.youtube.com/channel/UCNSKmAHYhDIctxpoZ9YADXg -->
+        <a href="https://realpolish.pl/">realpolish.pl</a> | <a href="https://www.youtube.com/@MrRealPolish">YouTube</a></h2>
+    </div>
 
     <button onclick="toggleHeading();">Przełącz tytuł</button>
     <button onclick="setDarkMode();">Ciemny</button>
@@ -74,7 +86,7 @@
       <!-- Copy answers from Word doc & paste to here -->
       <li>Jak jeszcze profesor <a href="zabezpieczył">zabezpieczył</a> Lucy?<br>Przywiózł jej dużo czosnku.<br>Rozłożył go w całej sypialni.<br>&nbsp;</li>
       <li>Dlaczego pewnej nocy Artur wyszedł z domu?<br>Pewnej nocy, Artur poszedł z wizytą do jakiegoś chorego dziecka.<br>&nbsp;</li>
-      <li>Gdzie byli profesor <a href="oraz">oraz</a> Lucy kiedy wyszedł?<br>Profesor czytał w bibliotece oraz Lucy spała w swojej sypialni.<br>&nbsp;</li>
+      <li>Gdzie byli profesor <a href="oraz">oraz</a> Lucy kiedy wyszedł?<br>Profesor czytał w bibliotece a Lucy spała w swojej sypialni.<br>&nbsp;</li>
       <!-- **************************************************************************************************** --->
       <!-- 10 to 12 -->
       <!-- Copy answers from Word doc & paste to here -->
@@ -90,4 +102,5 @@
       <!-- **************************************************************************************************** --->
     </ol>
   </body>
+
 </html>
