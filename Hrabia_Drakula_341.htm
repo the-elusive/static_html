@@ -43,7 +43,7 @@
         const elements = document.querySelectorAll('h1, h2, h3, li, button');
         const change = direction === '+' ? 2 : -2;
         
-        console.log('Adjusting font sizes:', direction);
+        console.log('---------- Adjusting font sizes:' + direction + ' ----------');
         elements.forEach(el => {
           let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
           let newSize = currentSize + change;
@@ -51,7 +51,7 @@
           el.style.fontSize = newSize + 'px';
           console.log('Tag: ' + el.tagName.toLowerCase() + '. currentSize: ' + currentSize + '. newSize: ' + newSize + '.')
         });
-        console.log('Adjusted font sizes.');
+        console.log('---------- Adjusted font sizes ----------');
       }
     </script>
   </head>
@@ -108,6 +108,7 @@
   </body>
 
 </html>
+
 
 
 
