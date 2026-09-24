@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+
+    <!-- ***** Robots tag with attribution section STARTS ***** -->
+    <!--
+    Source - https://stackoverflow.com/questions/67192771/what-is-the-impact-of-a-meta-tag-with-content-noindex-nofollow
+    Specific post: https://stackoverflow.com/a/78564852
+    Posted by Kapilraj Parameswararajah
+    Retrieved 2025-11-25, License - CC BY-SA 4.0
+    -->
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <!-- ***** Robots tag with attribution section ENDS ***** -->
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <base href="https://context.reverso.net/translation/polish-english/"> -->
+    <title>My useful links</title>
+    <style>
+      body {
+        background-color: black;
+        color: white;
+      }
+      
+      .hidden {
+        display: none;
+      }
+    </style>
+    <script>
+      function toggleHeading() {
+        const heading = document.getElementById('toggleThis');
+        heading.classList.toggle('hidden');
+      }
+      function setDarkMode() {
+        document.body.style.backgroundColor = 'black';
+        document.body.style.color = 'white';
+      }
+      function setLightMode() {
+        document.body.style.backgroundColor = 'white';
+        document.body.style.color = 'black';
+      }
+      function adjustFontSize(direction) {
+        const elements = document.querySelectorAll('h1, h2, h3, li, button');
+        const change = direction === '+' ? 2 : -2;
+        
+        console.log('---------- Adjusting font sizes:' + direction + ' ----------');
+        elements.forEach(el => {
+          let currentSize = parseFloat(window.getComputedStyle(el).fontSize);
+          let newSize = currentSize + change;
+          if (newSize < 6) newSize = 6;
+          el.style.fontSize = newSize + 'px';
+          console.log('Tag: ' + el.tagName.toLowerCase() + '. currentSize: ' + currentSize + '. newSize: ' + newSize + '.')
+        });
+        console.log('---------- Adjusted font sizes ----------');
+      }
+      function hideButtons() {
+        document.getElementById('buttonBar').classList.add('hidden');
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          document.getElementById('buttonBar').classList.remove('hidden');
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="toggleThis">
+      <h1>My useful links</h1><br>
+      <h2>
+        <a href="https://the-elusive.github.io/static_html/MyUsefulLinks.htm">https://the-elusive.github.io/static_html/MyUsefulLinks.htm</a>
+      </h2>
+    </div>
+
+    <div id="buttonBar">
+      <button onclick="toggleHeading();">Toggle heading</button>
+      <button onclick="setDarkMode();">Dark</button>
+      <button onclick="setLightMode();">Light</button>
+      <button onclick="adjustFontSize('-');">Font-2</button>
+      <button onclick="adjustFontSize('+');">Font+2</button>
+      <button onclick="hideButtons();" title="Press Esc to show buttons again">Hide buttons</button>
+    </div>
+
+    <ol>
+
+      <li>
+        Get your own Run DMC-esque logo:<br>
+        <a href="https://kmein.github.io/gen-dmc/">https://kmein.github.io/gen-dmc/</a><br>
+        &nbsp;
+      </li>
+
+      <li>
+        VBA developers, save your eyesight:<br>
+        <a href="https://myexcelgenius.com/coding-vba-on-the-dark-side/">https://myexcelgenius.com/coding-vba-on-the-dark-side/</a><br>&nbsp;
+      </li>
+
+      <li>
+        Windows 10 & 11 God Mode:<br>
+        <a href="https://www.tomshardware.com/how-to/enable-god-mode-windows-11">https://www.tomshardware.com/how-to/enable-god-mode-windows-11</a><br>&nbsp;
+      </li>
+
+      <li>
+        The ids of each item in the ribbon of every Microsoft Office product:<br>
+        <a href="https://www.microsoft.com/en-us/download/details.aspx?id=50745">https://www.microsoft.com/en-us/download/details.aspx?id=50745</a><br>&nbsp;
+      </li>
+
+      <li>
+        Referencing Pivot Table Ranges in VBA:<br>
+        <a href="https://peltiertech.com/referencing-pivot-table-ranges-in-vba/">https://peltiertech.com/referencing-pivot-table-ranges-in-vba/</a><br>&nbsp;
+      </li>
+
+      <li>
+        Awesome & free Firefox cache viewer:<br>
+        <a href="https://www.nirsoft.net/utils/mozilla_cache_viewer.html">https://www.nirsoft.net/utils/mozilla_cache_viewer.html</a><br>&nbsp;
+      </li>
+
+      <li>
+        Chrome cache viewer:<br>
+        <a href="https://www.nirsoft.net/utils/chrome_cache_view.html">https://www.nirsoft.net/utils/chrome_cache_view.html</a><br>&nbsp;
+      </li>
+
+      <li>
+        John Watson Rooney's amazing webscraping youtube channel:<br>
+        <a href="https://www.youtube.com/c/JohnWatsonRooney">https://www.youtube.com/c/JohnWatsonRooney</a><br>&nbsp;
+      </li>
+
+      <li>
+        Selenium for Excel:<br>
+        <a href="https://github.com/florentbr/SeleniumBasic/releases/tag/v2.0.9.0">https://github.com/florentbr/SeleniumBasic/releases/tag/v2.0.9.0</a><br>
+        <a href="https://github.com/the-elusive/excel_stuff/tree/main/Chromedriver">https://github.com/the-elusive/excel_stuff/tree/main/Chromedriver</a><br>&nbsp;
+      </li>
+
+      <li>
+        Download latest chromedriver for use with Selenium for Excel above:<br>
+        <a href="https://googlechromelabs.github.io/chrome-for-testing/#stable">https://googlechromelabs.github.io/chrome-for-testing/#stable</a><br>&nbsp;
+      </li>
+
+      <li>
+        Install Microsoft Windows without all the bloatware:<br>
+        <a href="https://ntdev.blog/">https://ntdev.blog/</a><br>&nbsp;
+      </li>
+
+      <li>
+        AOMEI Partition Assistant (free version available):<br>
+        <a href="https://www.aomeitech.com/aomei-partition-assistant.html">https://www.aomeitech.com/aomei-partition-assistant.html</a><br>&nbsp;
+      </li>
+
+      <li>
+        PowerBI Query Generator for GitHub GraphQL API v4:<br>
+        <a href="https://jsfiddle.net/rockyintel/1sqm7dpf/">https://jsfiddle.net/rockyintel/1sqm7dpf/</a><br>&nbsp;
+      </li>
+
+      <!-- <li>
+        abc<br>
+        <a href=""></a><br>&nbsp;
+      </li>
+
+      <li>
+        abc<br>
+        <a href=""></a><br>&nbsp;
+      </li>
+
+      <li>
+        abc<br>
+        <a href=""></a><br>&nbsp;
+      </li> -->
+
+    </ol>
+
+  </body>
+
+</html>
