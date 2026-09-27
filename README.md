@@ -1,6 +1,8 @@
 https://the-elusive.github.io/static_html/MyUsefulLinks.htm
 
-https://the-elusive.github.io/static_html/reed-offices.html
+https://the-elusive.github.io/static_html/reed-offices_v1.html
+
+https://the-elusive.github.io/static_html/reed-offices_v2.html
 
 For my reference:
 
