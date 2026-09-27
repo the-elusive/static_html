@@ -1,4 +1,6 @@
-[MyUsefulLinks.htm](https://the-elusive.github.io/static_html/MyUsefulLinks.htm)
+https://the-elusive.github.io/static_html/MyUsefulLinks.htm
+
+https://the-elusive.github.io/static_html/reed-offices.html
 
 For my reference:
 
