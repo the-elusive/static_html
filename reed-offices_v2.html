@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reed Offices</title>
+</head>
+<body>
+
+<select id="region">
+  <option value="London">London</option>
+  <option value="South East">South East</option>
+</select>
+
+<label for="openTabs">Open tabs</label>
+<select id="openTabs"></select>
+
+<div id="output"></div>
+
+<script>
+const offices = [
+  { region: "London", office: "Victoria",     url: "https://www.reed.com/offices/reed-recruitment-london-victoria" },
+  { region: "London", office: "Farringdon",   url: "https://www.reed.com/offices/reed-recruitment-farringdon" },
+  { region: "London", office: "Bury Street",  url: "https://www.reed.com/offices/reed-recruitment-bury-street" },
+  { region: "London", office: "Hammersmith",  url: "https://www.reed.com/offices/reed-recruitment-hammersmith" },
+  { region: "London", office: "Stratford",    url: "https://www.reed.com/offices/reed-recruitment-stratford" },
+  { region: "London", office: "Wembley",      url: "https://www.reed.com/offices/reed-recruitment-wembley" },
+  { region: "London", office: "Ealing",       url: "https://www.reed.com/offices/reed-recruitment-ealing" },
+  { region: "London", office: "Richmond",     url: "https://www.reed.com/offices/reed-recruitment-richmond" },
+  { region: "London", office: "Raynes Park",  url: "https://www.reed.com/offices/reed-recruitment-raynes-park" },
+  { region: "London", office: "Enfield",      url: "https://www.reed.com/offices/reed-recruitment-enfield" },
+  { region: "London", office: "Hounslow",     url: "https://www.reed.com/offices/reed-recruitment-hounslow" },
+  { region: "London", office: "Staines",      url: "https://www.reed.com/offices/reed-recruitment-staines" },
+  { region: "London", office: "Uxbridge",     url: "https://www.reed.com/offices/reed-recruitment-uxbridge" },
+  { region: "London", office: "Dartford",     url: "https://www.reed.com/offices/reed-recruitment-dartford" },
+  { region: "London", office: "Camberwell",   url: "https://www.reed.com/offices/reed-recruitment-camberwell" },
+  { region: "London", office: "Bromley",      url: "https://www.reed.com/offices/reed-recruitment-bromley" },
+  { region: "London", office: "Sutton",       url: "https://www.reed.com/offices/reed-recruitment-sutton" },
+  { region: "London", office: "Docklands",    url: "https://www.reed.com/offices/reed-recruitment-docklands" },
+  { region: "London", office: "Ilford",       url: "https://www.reed.com/offices/reed-recruitment-ilford" },
+  { region: "London", office: "Clapham",      url: "https://www.reed.com/offices/reed-recruitment-clapham" },
+  { region: "London", office: "Croydon",      url: "https://www.reed.com/offices/reed-recruitment-croydon" }
+];
+
+const select = document.getElementById("region");
+const output = document.getElementById("output");
+const openTabs = document.getElementById("openTabs");
+
+for (let n = 5; n <= 50; n += 5) {
+  openTabs.add(new Option(n, n));
+}
+
+function render() {
+  const region = select.value;
+  const matches = offices.filter(o => o.region === region);
+
+  output.innerHTML = "";
+
+  if (matches.length === 0) {
+    const p = document.createElement("p");
+    p.textContent = `No offices found for "${region}".`;
+    output.appendChild(p);
+    return;
+  }
+
+  const tip = document.createElement("p");
+  tip.textContent = "Tip: hold down Ctrl (Cmd on a Mac) while clicking a URL below, or click it with the middle mouse button. " +
+    "It will open in a new background tab and you'll stay on this page.";
+  output.appendChild(tip);
+
+  const table = document.createElement("table");
+  table.border = 1;
+
+  const thead = table.createTHead();
+  const headRow = thead.insertRow();
+  ["#", "Office", "URL"].forEach(text => {
+    const th = document.createElement("th");
+    th.textContent = text;
+    headRow.appendChild(th);
+  });
+
+  const tbody = table.createTBody();
+  matches.forEach((o, i) => {
+    const row = tbody.insertRow();
+    row.insertCell().textContent = i + 1;
+    row.insertCell().textContent = o.office;
+    const a = document.createElement("a");
+    a.href = o.url;
+    a.textContent = o.url;
+    a.target = "_blank";
+    row.insertCell().appendChild(a);
+  });
+
+  output.appendChild(table);
+}
+
+select.addEventListener("change", render);
+openTabs.addEventListener("change", render);
+window.addEventListener("load", render);
+</script>
+
+</body>
+</html>
