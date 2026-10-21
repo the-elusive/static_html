@@ -1,4 +1,4 @@
-https://the-elusive.github.io/static_html/textarea.htm
+https://the-elusive.github.io/static_html/TEXTAREA.htm
 
 https://the-elusive.github.io/static_html/MyUsefulLinks.htm
 
