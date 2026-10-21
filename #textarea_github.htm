@@ -1,0 +1,207 @@
+<html>
+  <head>
+    <title>I use this to copy characters when they're not easily accessible on my current keyboard</title>
+    <script>
+
+    window.onload = function() {
+      document.getElementById("MyTextArea").addEventListener("input", function() {
+        document.getElementById("MyParagraph").innerText = "Length of MyParagraph = " + document.getElementById("MyTextArea").value.length + "."
+      });
+      document.getElementById("MyTextArea").value = "⭐";
+      // document.getElementById("PolChars").style.display="block";      
+      // document.getElementById("SpecChars").style.display="block";
+      TogglePolChars2();
+      ToggleSpecChars2();
+      document.getElementById("SelectMe").select();
+      // alert("Pipe symbol is selected.");
+    }
+    function TogglePolChars() {
+
+      if (document.getElementById("PolChars").style.display=='block') {
+        document.getElementById("PolChars").style.display="none";
+      }
+      else {
+        document.getElementById("PolChars").style.display="block";
+      }
+    }
+    function TogglePolChars2() {
+
+      const PolChars = document.getElementById('PolChars');
+      PolChars.classList.toggle('hidden');
+    }
+    function ToggleSpecChars() {
+
+      if (document.getElementById("SpecChars").style.display=='block') {
+        document.getElementById("SpecChars").style.display="none";
+      }
+      else {
+        document.getElementById("SpecChars").style.display="block";
+      }
+    }
+    function ToggleSpecChars2() {
+
+      const SpecChars = document.getElementById('SpecChars');
+      SpecChars.classList.toggle('hidden');
+    }
+    </script>
+
+    <style>
+      body {
+        background: rgb(160, 160, 160);
+        /* color: white; */
+      }
+      .hidden {
+        display: none;
+      }
+      .LB { /* Light blue */
+        background: rgb(204, 236, 255);
+      }
+      .DB { /* Dark blue */
+        background: rgb(154, 203, 255);
+      }
+      .LY { /* Light yellow */
+        background: rgb(255, 255, 204);
+      }
+      .DY { /* Dark yellow */
+        background: rgb(255, 255, 102);
+      }
+      .LP { /* Light purple */
+        background: rgb(242, 206, 239);
+      }
+      .NB { /* Navy blue */
+        background: rgb(72, 61, 139);
+      }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <p><a href="https://www.w3schools.com/charsets/ref_utf_math.asp"><b>AWESOME: UTF-8 Math Operators (w3schools)</b></a></p>
+
+    <!-- POLCHARS -->
+    <p><a href="https://en.wikipedia.org/wiki/Polish_alphabet#Computer_encoding"><b>Polish characters</b></a>: <input type="button" onclick="TogglePolChars2();" value="Toggle"></p>
+
+    <p id="PolChars"><span style="font-size:50px">ĄĆĘŁŃÓŚŹŻąćęłńóśźż</span><table border="0" cellpadding="5" cellspacing="0"><form> 
+      <tr>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0104">260</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-a-with-ogonek/">&#38;Aogon&#59;</a></td>
+        <td class="LB"><input type="text" value="&Aogon;" size="1"></td>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0105">261</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-a-with-ogonek/">&#38;aogon&#59;</a></td>
+        <td class="LB"><input type="text" value="&aogon;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+0106">262</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-c-with-acute/">&#38;Cacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&Cacute;" size="1"></td>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+0107">263</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-c-with-acute/">&#38;cacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&cacute;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0118">280</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-e-with-ogonek/">&#38;Eogon&#59;</a></td>
+        <td class="LB"><input type="text" value="&Eogon;" size="1"></td>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0119">281</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-e-with-ogonek/">&#38;eogon&#59;</a></td>
+        <td class="LB"><input type="text" value="&eogon;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+0141">321</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-l-with-stroke/">&#38;Lstrok&#59;</a></td>
+        <td class="LY"><input type="text" value="&Lstrok;" size="1"></td>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+0142">322</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-l-with-stroke/">&#38;lstrok&#59;</a></td>
+        <td class="LY"><input type="text" value="&lstrok;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0143">323</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-n-with-acute/">&#38;Nacute&#59;</a></td>
+        <td class="LB"><input type="text" value="&Nacute;" size="1"></td>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+0144">324</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-n-with-acute/">&#38;nacute&#59;</a></td>
+        <td class="LB"><input type="text" value="&nacute;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+00D3">211</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-o-with-acute/">&#38;Oacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&Oacute;" size="1"></td>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+00F3">243</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-o-with-acute/">&#38;oacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&oacute;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+015A">346</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-s-with-acute/">&#38;Sacute&#59;</a></td>
+        <td class="LB"><input type="text" value="&Sacute;" size="1"></td>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+015B">347</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-s-with-acute/">&#38;sacute&#59;</a></td>
+        <td class="LB"><input type="text" value="&sacute;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+0179">377</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-z-with-acute/">&#38;Zacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&Zacute;" size="1"></td>
+        <td class="LY"><a href="https://www.compart.com/en/unicode/U+017A">378</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-z-with-acute/">&#38;zacute&#59;</a></td>
+        <td class="LY"><input type="text" value="&zacute;" size="1"></td>
+      </tr>
+      <tr>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+017B">379</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/uppercase-z-with-dot-above/">&#38;Zdot&#59;</a></td>
+        <td class="LB"><input type="text" value="&Zdot;" size="1"></td>
+        <td class="LB"><a href="https://www.compart.com/en/unicode/U+017C">380</a> | <a href="https://www.toptal.com/designers/htmlarrows/letters/lowercase-z-with-dot-above/">&#38;zdot&#59;</a></td>
+        <td class="LB"><input type="text" value="&zdot;" size="1"></td>
+      </tr>
+    </form></table></p>
+
+    <!-- SPECCHARS -->
+
+    <p><b>Special characters</b>: <input type="button" onclick="ToggleSpecChars2();" value="Toggle"></p>
+
+    <p id="SpecChars"><table border="0" cellpadding="5" cellspacing="0"><form>
+      <tr>
+        <td class="LB"><input type="text" value="&#8592;" size="1"> <a href="https://www.compart.com/en/unicode/U+2190">8592</a> | <a href="https://www.toptal.com/designers/htmlarrows/arrows/left-arrow/">&#38;larr&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#8593;" size="1"> <a href="https://www.compart.com/en/unicode/U+2191">8593</a> | <a href="https://www.toptal.com/designers/htmlarrows/arrows/up-arrow/">&#38;uarr&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#8594;" size="1"> <a href="https://www.compart.com/en/unicode/U+2192">8594</a> | <a href="https://www.toptal.com/designers/htmlarrows/arrows/right-arrow/">&#38;rarr&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#8595;" size="1"> <a href="https://www.compart.com/en/unicode/U+2193">8595</a> | <a href="https://www.toptal.com/designers/htmlarrows/arrows/down-arrow/">&#38;darr&#59;</a>&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="LY"><input type="text" value="&#163;" size="1"> <a href="https://www.compart.com/en/unicode/U+00A3">163</a> | <a href="https://www.toptal.com/designers/htmlarrows/currency/pound-sign/">&#38;pound&#59;</a>&nbsp;</td>
+        <td class="LY"><input type="text" value="&#8364;" size="1"> <a href="https://www.compart.com/en/unicode/U+20AC">8364</a> | <a href="https://www.toptal.com/designers/htmlarrows/currency/euro-sign/">&#38;euro&#59;</a>&nbsp;</td>
+        <td class="LY"><input type="text" value="&#35;" size="1"> <a href="https://www.compart.com/en/unicode/U+0023">35</a> | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/number-sign/">&#38;num&#59;</a>&nbsp;</td>
+        <td class="LY"><input type="text" value="&#8734;" size="1"> <a href="https://www.compart.com/en/unicode/U+221E">8734</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/infinity/">&#38;infin&#59;</a>&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="LB"><input type="text" value="&#247;" size="1"> <a href="https://www.compart.com/en/unicode/U+00F7">247</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/division-sign/">&#38;divide&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#215;" size="1"> <a href="https://www.compart.com/en/unicode/U+00D7">215</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/multiplication-sign/">&#38;times&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#8756;" size="1"> <a href="https://www.compart.com/en/unicode/U+2234">8756</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/therefore/">&#38;there4&#59;</a>&nbsp;</td>
+        <td class="LB"><input type="text" value="&#124;" size="1" id="SelectMe"> <a href="https://www.compart.com/en/unicode/U+007C">124</a> | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/vertical-bar/">&#38;vert&#59;</a>&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="LY"><input type="text" value="&#126;" size="1"> <a href="https://www.compart.com/en/unicode/U+007E">126</a> | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/tilde/">&#38;tilde&#59;</a>&nbsp;</td>
+        <td class="LY"><input type="text" value="&#172;" size="1"> <a href="https://www.compart.com/en/unicode/U+00AC">172</a> | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/not-sign/">&#38;not&#59;</a>&nbsp;</td>
+	<td class="LY"><input type="text" value="&#119909;" size="1"> <a href="https://www.compart.com/en/unicode/U+1D465">119909</a> | Mathematical Italic Small X&nbsp;</td>
+	<td class="LY"><input type="text" value="&#119910;" size="1"> <a href="https://www.compart.com/en/unicode/U+1D466">119910</a> | Mathematical Italic Small Y&nbsp;</td>
+      </tr>
+      <tr>
+	<td class="LB"><input type="text" value="&#189;" size="1"> <a href="https://www.compart.com/en/unicode/U+00BD">189</a> | <a href="https://www.toptal.com/designers/htmlarrows/numbers/fraction-one-half/">&#38;frac12&#59;</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#8800;" size="1"> <a href="https://www.compart.com/en/unicode/U+2260">8800</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/not-equal-to-sign/">&#38;ne&#59;</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#8322;" size="1"> <a href="https://www.compart.com/en/unicode/U+2082">8322</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/subscript-two/">Subscript Two</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#178;" size="1"> <a href="https://www.compart.com/en/unicode/U+00B2">178</a> | <a href="https://www.toptal.com/designers/htmlarrows/math/superscript-two/">&#38;sup2&#59;</a>&nbsp;</td>
+      </tr>
+      <tr>
+	<td class="LY"><input type="text" value="&#8451;" size="1"> <a href="https://www.compart.com/en/unicode/U+2103">8451</a> | <a href="https://www.toptal.com/designers/htmlarrows/symbols/degree-celsius/">Degree Celsius</a>&nbsp;</td>
+	<td class="LY"><input type="text" value="&#8457;" size="1"> <a href="https://www.compart.com/en/unicode/U+2109">8457</a> | <a href="https://www.toptal.com/designers/htmlarrows/symbols/degree-fahrenheit/">Degree Fahrenheit</a>&nbsp;</td>
+	<td class="LY"><input type="text" value="&#128077;" size="1"> <a href="https://www.compart.com/en/unicode/U+1F44D">128077</a> | Thumbs Up Sign&nbsp;</td>
+	<td class="LY"><input type="text" value="&#128031;" size="1"> <a href="https://www.compart.com/en/unicode/U+1F41F">128031</a> | Fish&nbsp;</td>
+      </tr>
+      <tr>
+	<td class="LB"><input type="text" value="&#92;" size="1"> 92 | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/backslash/">&#38;bsol2&#59;</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#60;" size="1"> 60 | <a href="https://www.toptal.com/designers/htmlarrows/math/less-than-sign/">&#38;lt&#59;</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#62;" size="1"> 62 | <a href="https://www.toptal.com/designers/htmlarrows/math/greater-than-sign/">&#38;gt&#59;</a>&nbsp;</td>
+	<td class="LB"><input type="text" value="&#129318;" size="1"> <a href="https://www.compart.com/en/unicode/U+1F926">129318</a> | Face Palm&nbsp;</td>
+      </tr>
+
+      <!--
+      <tr>
+	<td style="background:rgb(204, 236, 255)"><input type="text" value="&#92;" size="1"> 92 | <a href="https://www.toptal.com/designers/htmlarrows/punctuation/backslash/">&#38;bsol2&#59;</a>&nbsp;</td>
+	<td style="background:rgb(255, 255, 204)"><input type="text" value="&#60;" size="1"> 60 | <a href="https://www.toptal.com/designers/htmlarrows/math/less-than-sign/">&#38;lt&#59;</a>&nbsp;</td>
+	<td style="background:rgb(255, 255, 102)"><input type="text" value="&#128031;" size="1"> <a href="https://www.compart.com/en/unicode/U+1F41F">128031</a> | No html entity&nbsp;</td>
+	<td style="background:rgb(255, 255, 102)">&nbsp;</td>
+      </tr>
+      -->
+
+    </form></table></p>
+
+    <!-- TEXTAREA -->
+    <p id="MyParagraph">Length of MyParagraph will appear here. Max chars in discogs' condition comments box is 500.</p>
+    <p><textarea id="MyTextArea" rows="25" cols="100" style="background: rgb(192,192,192);"></textarea></p>
+
+  </body>
+</html>
