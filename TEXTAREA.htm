@@ -12,6 +12,7 @@
       // document.getElementById("SpecChars").style.display="block";
       // TogglePolChars2();
       ToggleSpecChars2();
+      SetTabMode();
       document.getElementById("SelectMe").select();
       // alert("Pipe symbol is selected.");
     }
@@ -42,6 +43,19 @@
 
       const SpecChars = document.getElementById('SpecChars');
       SpecChars.classList.toggle('hidden');
+    }
+    function SetTabMode() {
+
+      // "selected": take links and buttons out of the tab order so Tab only visits the character boxes
+      const TabMode = document.getElementById("TabMode").value;
+      document.querySelectorAll("a, input[type=button]").forEach(function(el) {
+        if (TabMode == "selected") {
+          el.tabIndex = -1;
+        }
+        else {
+          el.removeAttribute("tabindex");
+        }
+      });
     }
     </script>
 
@@ -77,6 +91,13 @@
   </head>
 
   <body>
+
+    <p><label for="TabMode"><b>When tabbing select:</b></label>
+      <select id="TabMode" onchange="SetTabMode();">
+        <option value="everything">everything</option>
+        <option value="selected" selected>selected</option>
+      </select>
+    </p>
 
     <p><a href="https://www.w3schools.com/charsets/ref_utf_math.asp"><b>AWESOME: UTF-8 Math Operators (w3schools)</b></a></p>
 
