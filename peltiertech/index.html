@@ -53,12 +53,12 @@
     html {
       background-color: var(--bg);
     }
-    /* Everything confined to the left half of the screen:
-       50% of the viewport width, minus the 20px margin on each side */
+    /* Everything confined to the left two thirds of the screen:
+       66.667% of the viewport width, minus the 20px margin on each side */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      width: calc(50% - 40px);
+      width: calc(100% * 2 / 3 - 40px);
       background-color: var(--bg);
       color: var(--fg);
     }
@@ -89,9 +89,11 @@
     .file-list ol {
       margin: 0;
     }
+    /* Descriptions wrap at word boundaries; a single over-long word
+       (e.g. a filename) is still allowed to break rather than overflow */
     .file-list li {
       margin: 2px 0;
-      word-break: break-all;
+      overflow-wrap: anywhere;
     }
     .navigation {
       display: flex;
@@ -140,6 +142,11 @@
       border-radius: 2px;
     }
     */
+    .image-desc {
+      margin: 0 0 15px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
     .image-container {
       text-align: center;
       border: 1px solid var(--border);
@@ -175,6 +182,8 @@
     <button id="themeBtn" onclick="toggleTheme()" title="Switch between light and dark mode"></button>
   </div>
 
+  <p id="imageDesc" class="image-desc"></p>
+
   <div class="image-container">
     <img id="imageView" src="" alt="Selected PNG" />
   </div>
@@ -201,31 +210,31 @@
     darkQuery.addEventListener("change", updateThemeButton);
     updateThemeButton();
 
-    // 1. Image filenames from PNGs.txt
+    // 1. Image filenames from PNGs.txt, each with its own description
     const imageFiles = [
-      "PivotTable.png",
-      "PTColumnRange.png",
-      // "PTCX4_gold_280x233.png",
-      // "PTCX5_660x82.png",
-      // "PTCX5_728x90.png",
-      "PTDataBodyRange.png",
-      "PTDataLabelRange.png",
-      "PTPageRange.png",
-      "PTPFdatePIfebDataRange.png",
-      "PTPFyearsDataRange.png",
-      "PTPFyearsDataRangeA.png",
-      "PTPFyearsLabelRange.png",
-      "PTPFyearsPI2004DataRange.png",
-      "PTPFyearsPI2004DataRangeA.png",
-      "PTPFyearsPI2004LabelRange.png",
-      "PTPFyearsPI2004LabelRangeA.png",
-      "PTPFyrsPI2003entirerowINTPForderdatedatarange.png",
-      "PTRowRange.png",
-      "PTTableRange1.png",
-      "PTTableRange2.png",
-      "PTUnionYearsOrderDateDataRange.png",
-      "PT_DataBodyWithoutSubtotals.png",
-      "PT_Next_Column.png"
+      { file: 'PivotTable.png',                                    desc: 'Dummy desc' },
+      { file: 'PTTableRange1.png',                                 desc: 'pt.TableRange1.Select' },
+      { file: 'PTTableRange2.png',                                 desc: 'pt.TableRange2.Select' },
+      { file: 'PTRowRange.png',                                    desc: 'pt.RowRange.Select' },
+      { file: 'PTColumnRange.png',                                 desc: 'pt.ColumnRange.Select' },
+      // { file: 'PTCX4_gold_280x233.png',                         desc: 'Dummy desc' },
+      // { file: 'PTCX5_660x82.png',                               desc: 'Dummy desc' },
+      // { file: 'PTCX5_728x90.png',                               desc: 'Dummy desc' },
+      { file: 'PTDataBodyRange.png',                               desc: 'Dummy desc' },
+      { file: 'PTDataLabelRange.png',                              desc: 'Dummy desc' },
+      { file: 'PTPageRange.png',                                   desc: 'Dummy desc' },
+      { file: 'PTPFdatePIfebDataRange.png',                        desc: 'Dummy desc' },
+      { file: 'PTPFyearsDataRange.png',                            desc: 'Dummy desc' },
+      { file: 'PTPFyearsDataRangeA.png',                           desc: 'Dummy desc' },
+      { file: 'PTPFyearsLabelRange.png',                           desc: 'Dummy desc' },
+      { file: 'PTPFyearsPI2004DataRange.png',                      desc: 'Dummy desc' },
+      { file: 'PTPFyearsPI2004DataRangeA.png',                     desc: 'Dummy desc' },
+      { file: 'PTPFyearsPI2004LabelRange.png',                     desc: 'Dummy desc' },
+      { file: 'PTPFyearsPI2004LabelRangeA.png',                    desc: 'pt.PivotFields("Years").PivotItems("2004").LabelRange.Select' },
+      { file: 'PTPFyrsPI2003entirerowINTPForderdatedatarange.png', desc: 'Dummy desc' },
+      { file: 'PTUnionYearsOrderDateDataRange.png',                desc: 'Dummy desc' },
+      { file: 'PT_DataBodyWithoutSubtotals.png',                   desc: 'Dummy desc' },
+      { file: 'PT_Next_Column.png',                                desc: 'Dummy desc' }
     ];
 
     let currentIndex = 0;
@@ -234,7 +243,7 @@
     // Each link loads its image into the viewer instead of navigating away.
     function buildFileList() {
       const list = document.getElementById("fileList");
-      imageFiles.forEach((file, i) => {
+      imageFiles.forEach(({ file, desc }, i) => {
         const li = document.createElement("li");
         const a = document.createElement("a");
         a.href = encodeURIComponent(file);
@@ -243,6 +252,8 @@
           e.preventDefault();
           loadImage(i);
         });
+        // Plain-text description first, then the clickable filename
+        li.appendChild(document.createTextNode(`${desc}: `));
         li.appendChild(a);
         list.appendChild(li);
       });
@@ -272,7 +283,7 @@
       }
 
       currentIndex = index;
-      const currentFile = imageFiles[currentIndex];
+      const { file: currentFile, desc: currentDesc } = imageFiles[currentIndex];
       const encodedFile = encodeURIComponent(currentFile);
 
       // Format counter string: "03 of 23"
@@ -292,8 +303,13 @@
       fileLinkElem.textContent = `${counterText}: ${currentFile}`;
       fileLinkElem.setAttribute("href", encodedFile);
 
-      // Update image source
-      document.getElementById("imageView").setAttribute("src", encodedFile);
+      // Show this image's description
+      document.getElementById("imageDesc").textContent = currentDesc;
+
+      // Update image source (description doubles as alt text)
+      const imgElem = document.getElementById("imageView");
+      imgElem.setAttribute("src", encodedFile);
+      imgElem.setAttribute("alt", currentDesc);
 
       // Disable buttons at boundaries
       document.getElementById("prevBtn").disabled = (currentIndex === 0);
