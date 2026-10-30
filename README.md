@@ -1,4 +1,7 @@
-https://the-elusive.github.io/static_html/index.htm
+index.html would appear to be the right filename for the homepage:\
+https://the-elusive.github.io/static_html
+
+https://the-elusive.github.io/static_html/peltiertech
 
 GitHub markdown guide:\
 https://the-elusive.github.io/static_html/hash-hrefs-v4.html
