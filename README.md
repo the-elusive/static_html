@@ -4,7 +4,7 @@ https://the-elusive.github.io/static_html
 https://the-elusive.github.io/static_html/peltiertech
 
 GitHub markdown guide:\
-https://the-elusive.github.io/static_html/hash-hrefs-v4.html
+https://the-elusive.github.io/static_html/GitHubMarkdown.html
 
 https://the-elusive.github.io/static_html/TEXTAREA.htm
 
