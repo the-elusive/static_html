@@ -16,8 +16,8 @@
       --btn-bg: #f0f0f0;
       --btn-fg: #000000;
       --btn-border: #999999;
-      --hl-bg: #ffff00;
-      --hl-fg: #000000;
+      /* --hl-bg: #ffff00; */
+      /* --hl-fg: #000000; */
     }
     /* Follow the OS setting unless the user has forced light */
     @media (prefers-color-scheme: dark) {
@@ -31,8 +31,8 @@
         --btn-bg: #2a2a2a;
         --btn-fg: #e6e6e6;
         --btn-border: #555555;
-        --hl-bg: #d4c200;
-        --hl-fg: #000000;
+        /* --hl-bg: #d4c200; */
+        /* --hl-fg: #000000; */
       }
     }
     /* Forced dark via the toggle */
@@ -46,13 +46,19 @@
       --btn-bg: #2a2a2a;
       --btn-fg: #e6e6e6;
       --btn-border: #555555;
-      --hl-bg: #d4c200;
-      --hl-fg: #000000;
+      /* --hl-bg: #d4c200; */
+      /* --hl-fg: #000000; */
     }
 
+    html {
+      background-color: var(--bg);
+    }
+    /* Everything confined to the left half of the screen:
+       50% of the viewport width, minus the 20px margin on each side */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
+      width: calc(50% - 40px);
       background-color: var(--bg);
       color: var(--fg);
     }
@@ -65,6 +71,26 @@
     .source-link {
       margin: 0 0 15px;
       font-size: 14px;
+      word-break: break-all;
+    }
+    /* Toggleable file list */
+    .file-list-toggle {
+      margin-bottom: 10px;
+    }
+    .file-list {
+      border: 1px solid var(--border);
+      background-color: var(--panel-bg);
+      padding: 10px 10px 10px 0;
+      margin-bottom: 15px;
+      max-height: 40vh;
+      overflow: auto;
+      font-size: 14px;
+    }
+    .file-list ol {
+      margin: 0;
+    }
+    .file-list li {
+      margin: 2px 0;
       word-break: break-all;
     }
     .navigation {
@@ -90,23 +116,30 @@
       margin-left: auto;
       font-size: 14px;
     }
+    #listToggleBtn {
+      font-size: 14px;
+    }
     #fileLink {
       font-weight: bold;
       font-size: 16px;
       color: var(--link);
       text-decoration: underline;
       cursor: pointer;
+      min-width: 0;
+      word-break: break-all;
     }
     #fileLink:hover {
       color: var(--link-hover);
     }
-    /* Highlight style for specific sections of the file name */
+    /* Highlight style for specific sections of the file name (disabled) */
+    /*
     .highlight {
       background-color: var(--hl-bg);
       color: var(--hl-fg);
       padding: 0 3px;
       border-radius: 2px;
     }
+    */
     .image-container {
       text-align: center;
       border: 1px solid var(--border);
@@ -127,10 +160,18 @@
 
   <p class="source-link"><a href="https://peltiertech.com/referencing-pivot-table-ranges-in-vba/" target="_blank">https://peltiertech.com/referencing-pivot-table-ranges-in-vba/</a></p>
 
+  <!-- Toggleable file list -->
+  <div class="file-list-toggle">
+    <button id="listToggleBtn" onclick="toggleFileList()" aria-expanded="false" aria-controls="fileListSection">☰ Show file list</button>
+  </div>
+  <div id="fileListSection" class="file-list" hidden>
+    <ol id="fileList"></ol>
+  </div>
+
   <div class="navigation">
     <button id="prevBtn" onclick="navigate(-1)">←</button>
-    <a id="fileLink" href="#" target="_blank" title="Click to open image natively in a new tab/window"></a>
     <button id="nextBtn" onclick="navigate(1)">→</button>
+    <a id="fileLink" href="#" target="_blank" title="Click to open image natively in a new tab/window"></a>
     <button id="themeBtn" onclick="toggleTheme()" title="Switch between light and dark mode"></button>
   </div>
 
@@ -189,6 +230,32 @@
 
     let currentIndex = 0;
 
+    // ---- Toggleable file list ----
+    // Each link loads its image into the viewer instead of navigating away.
+    function buildFileList() {
+      const list = document.getElementById("fileList");
+      imageFiles.forEach((file, i) => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = encodeURIComponent(file);
+        a.textContent = file;
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          loadImage(i);
+        });
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+    }
+
+    function toggleFileList() {
+      const section = document.getElementById("fileListSection");
+      const btn = document.getElementById("listToggleBtn");
+      section.hidden = !section.hidden;
+      btn.setAttribute("aria-expanded", String(!section.hidden));
+      btn.textContent = section.hidden ? "☰ Show file list" : "☰ Hide file list";
+    }
+
     // Helper to pad numbers with leading zeros
     function padNumber(num, total) {
       const digits = total.toString().length;
@@ -214,14 +281,15 @@
       const totalNumFormatted = padNumber(totalCount, totalCount);
       const counterText = `${currentNumFormatted} of ${totalNumFormatted}`;
 
-      // Highlight dimensions, ID numbers, or specific modifiers if present in the filename
-      const highlightedFile = currentFile.replace(
-        /(_\d+x\d+|_gold|\d{4})/g,
-        '<span class="highlight">$1</span>'
-      );
+      // Highlight dimensions, ID numbers, or specific modifiers if present in the filename (disabled)
+      // const highlightedFile = currentFile.replace(
+      //   /(_\d+x\d+|_gold|\d{4})/g,
+      //   '<span class="highlight">$1</span>'
+      // );
+      // fileLinkElem.innerHTML = `${counterText}: ${highlightedFile}`;
 
-      // Render updated html and destination link
-      fileLinkElem.innerHTML = `${counterText}: ${highlightedFile}`;
+      // Render updated text (no highlighting) and destination link
+      fileLinkElem.textContent = `${counterText}: ${currentFile}`;
       fileLinkElem.setAttribute("href", encodedFile);
 
       // Update image source
@@ -239,7 +307,8 @@
       }
     }
 
-    // Load initial image on page launch
+    // Build the file list and load initial image on page launch
+    buildFileList();
     loadImage(0);
   </script>
 
