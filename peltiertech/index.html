@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="color-scheme" content="light dark">
+  <title>PNG Image Viewer</title>
+  <style>
+    /* Theme tokens: light by default */
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --link: #0056b3;
+      --link-hover: #003366;
+      --panel-bg: #f9f9f9;
+      --border: #cccccc;
+      --btn-bg: #f0f0f0;
+      --btn-fg: #000000;
+      --btn-border: #999999;
+      --hl-bg: #ffff00;
+      --hl-fg: #000000;
+    }
+    /* Follow the OS setting unless the user has forced light */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #121212;
+        --fg: #e6e6e6;
+        --link: #6cb4ff;
+        --link-hover: #a8d4ff;
+        --panel-bg: #1e1e1e;
+        --border: #444444;
+        --btn-bg: #2a2a2a;
+        --btn-fg: #e6e6e6;
+        --btn-border: #555555;
+        --hl-bg: #d4c200;
+        --hl-fg: #000000;
+      }
+    }
+    /* Forced dark via the toggle */
+    :root[data-theme="dark"] {
+      --bg: #121212;
+      --fg: #e6e6e6;
+      --link: #6cb4ff;
+      --link-hover: #a8d4ff;
+      --panel-bg: #1e1e1e;
+      --border: #444444;
+      --btn-bg: #2a2a2a;
+      --btn-fg: #e6e6e6;
+      --btn-border: #555555;
+      --hl-bg: #d4c200;
+      --hl-fg: #000000;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: var(--bg);
+      color: var(--fg);
+    }
+    a {
+      color: var(--link);
+    }
+    a:hover {
+      color: var(--link-hover);
+    }
+    .source-link {
+      margin: 0 0 15px;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    .navigation {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    button {
+      font-size: 18px;
+      padding: 5px 15px;
+      cursor: pointer;
+      background-color: var(--btn-bg);
+      color: var(--btn-fg);
+      border: 1px solid var(--btn-border);
+      border-radius: 3px;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    #themeBtn {
+      margin-left: auto;
+      font-size: 14px;
+    }
+    #fileLink {
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--link);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    #fileLink:hover {
+      color: var(--link-hover);
+    }
+    /* Highlight style for specific sections of the file name */
+    .highlight {
+      background-color: var(--hl-bg);
+      color: var(--hl-fg);
+      padding: 0 3px;
+      border-radius: 2px;
+    }
+    .image-container {
+      text-align: center;
+      border: 1px solid var(--border);
+      padding: 10px;
+      background-color: var(--panel-bg);
+      max-height: 85vh;
+      overflow: auto;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="source-link"><a href="https://peltiertech.com/referencing-pivot-table-ranges-in-vba/" target="_blank">https://peltiertech.com/referencing-pivot-table-ranges-in-vba/</a></p>
+
+  <div class="navigation">
+    <button id="prevBtn" onclick="navigate(-1)">←</button>
+    <a id="fileLink" href="#" target="_blank" title="Click to open image natively in a new tab/window"></a>
+    <button id="nextBtn" onclick="navigate(1)">→</button>
+    <button id="themeBtn" onclick="toggleTheme()" title="Switch between light and dark mode"></button>
+  </div>
+
+  <div class="image-container">
+    <img id="imageView" src="" alt="Selected PNG" />
+  </div>
+
+  <script>
+    // ---- Light / dark mode ----
+    // Starts from the OS setting; the button overrides it for this page view.
+    const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function isDark() {
+      const forced = document.documentElement.getAttribute("data-theme");
+      return forced ? forced === "dark" : darkQuery.matches;
+    }
+
+    function updateThemeButton() {
+      document.getElementById("themeBtn").textContent = isDark() ? "☀ Light" : "☾ Dark";
+    }
+
+    function toggleTheme() {
+      document.documentElement.setAttribute("data-theme", isDark() ? "light" : "dark");
+      updateThemeButton();
+    }
+
+    darkQuery.addEventListener("change", updateThemeButton);
+    updateThemeButton();
+
+    // 1. Image filenames from PNGs.txt
+    const imageFiles = [
+      "PivotTable.png",
+      "PTColumnRange.png",
+      // "PTCX4_gold_280x233.png",
+      // "PTCX5_660x82.png",
+      // "PTCX5_728x90.png",
+      "PTDataBodyRange.png",
+      "PTDataLabelRange.png",
+      "PTPageRange.png",
+      "PTPFdatePIfebDataRange.png",
+      "PTPFyearsDataRange.png",
+      "PTPFyearsDataRangeA.png",
+      "PTPFyearsLabelRange.png",
+      "PTPFyearsPI2004DataRange.png",
+      "PTPFyearsPI2004DataRangeA.png",
+      "PTPFyearsPI2004LabelRange.png",
+      "PTPFyearsPI2004LabelRangeA.png",
+      "PTPFyrsPI2003entirerowINTPForderdatedatarange.png",
+      "PTRowRange.png",
+      "PTTableRange1.png",
+      "PTTableRange2.png",
+      "PTUnionYearsOrderDateDataRange.png",
+      "PT_DataBodyWithoutSubtotals.png",
+      "PT_Next_Column.png"
+    ];
+
+    let currentIndex = 0;
+
+    // Helper to pad numbers with leading zeros
+    function padNumber(num, total) {
+      const digits = total.toString().length;
+      return num.toString().padStart(Math.max(2, digits), '0');
+    }
+
+    function loadImage(index) {
+      const fileLinkElem = document.getElementById("fileLink");
+
+      if (imageFiles.length === 0) {
+        fileLinkElem.textContent = "No PNGs listed in array.";
+        fileLinkElem.removeAttribute("href");
+        return;
+      }
+
+      currentIndex = index;
+      const currentFile = imageFiles[currentIndex];
+      const encodedFile = encodeURIComponent(currentFile);
+
+      // Format counter string: "03 of 23"
+      const totalCount = imageFiles.length;
+      const currentNumFormatted = padNumber(currentIndex + 1, totalCount);
+      const totalNumFormatted = padNumber(totalCount, totalCount);
+      const counterText = `${currentNumFormatted} of ${totalNumFormatted}`;
+
+      // Highlight dimensions, ID numbers, or specific modifiers if present in the filename
+      const highlightedFile = currentFile.replace(
+        /(_\d+x\d+|_gold|\d{4})/g,
+        '<span class="highlight">$1</span>'
+      );
+
+      // Render updated html and destination link
+      fileLinkElem.innerHTML = `${counterText}: ${highlightedFile}`;
+      fileLinkElem.setAttribute("href", encodedFile);
+
+      // Update image source
+      document.getElementById("imageView").setAttribute("src", encodedFile);
+
+      // Disable buttons at boundaries
+      document.getElementById("prevBtn").disabled = (currentIndex === 0);
+      document.getElementById("nextBtn").disabled = (currentIndex === imageFiles.length - 1);
+    }
+
+    function navigate(direction) {
+      const newIndex = currentIndex + direction;
+      if (newIndex >= 0 && newIndex < imageFiles.length) {
+        loadImage(newIndex);
+      }
+    }
+
+    // Load initial image on page launch
+    loadImage(0);
+  </script>
+
+</body>
+</html>
