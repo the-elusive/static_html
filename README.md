@@ -1,5 +1,8 @@
 https://the-elusive.github.io/static_html/index.htm
 
+GitHub markdown guide:\
+https://the-elusive.github.io/static_html/hash-hrefs-v4.html
+
 https://the-elusive.github.io/static_html/TEXTAREA.htm
 
 https://the-elusive.github.io/static_html/MyUsefulLinks.htm
