@@ -7,6 +7,7 @@
   <style>
     /* Theme tokens: light by default */
     :root {
+      --file-list-max-height: 25vh; /* Initial height variable */
       --bg: #ffffff;
       --fg: #000000;
       --link: #0056b3;
@@ -16,8 +17,6 @@
       --btn-bg: #f0f0f0;
       --btn-fg: #000000;
       --btn-border: #999999;
-      /* --hl-bg: #ffff00; */
-      /* --hl-fg: #000000; */
     }
     /* Follow the OS setting unless the user has forced light */
     @media (prefers-color-scheme: dark) {
@@ -31,8 +30,6 @@
         --btn-bg: #2a2a2a;
         --btn-fg: #e6e6e6;
         --btn-border: #555555;
-        /* --hl-bg: #d4c200; */
-        /* --hl-fg: #000000; */
       }
     }
     /* Forced dark via the toggle */
@@ -46,8 +43,6 @@
       --btn-bg: #2a2a2a;
       --btn-fg: #e6e6e6;
       --btn-border: #555555;
-      /* --hl-bg: #d4c200; */
-      /* --hl-fg: #000000; */
     }
 
     html {
@@ -79,20 +74,36 @@
     }
     .file-list {
       border: 1px solid var(--border);
+      border-bottom: none; /* Connects smoothly to the resizer bar */
       background-color: var(--panel-bg);
       padding: 10px 10px 10px 0;
-      margin-bottom: 15px;
-      max-height: 40vh;
+      margin-bottom: 0;
+      height: var(--file-list-max-height);
+      max-height: 80vh;
+      min-height: 60px;
       overflow: auto;
       font-size: 14px;
+    }
+    /* Full-width draggable handle bar at the bottom */
+    .file-resizer {
+      height: 6px;
+      border: 1px solid var(--border);
+      background-color: var(--btn-bg);
+      cursor: ns-resize;
+      margin-bottom: 15px;
+      border-radius: 0 0 3px 3px;
+      opacity: 0.8;
+      transition: opacity 0.2s, background-color 0.2s;
+    }
+    .file-resizer:hover {
+      opacity: 1;
+      background-color: var(--border);
     }
     .file-list ol {
       margin: 0;
     }
-    /* Descriptions wrap at word boundaries; a single over-long word
-       (e.g. a filename) is still allowed to break rather than overflow */
     .file-list li {
-      margin: 2px 0;
+      margin: 4px 0;
       overflow-wrap: anywhere;
     }
     .navigation {
@@ -133,18 +144,9 @@
     #fileLink:hover {
       color: var(--link-hover);
     }
-    /* Highlight style for specific sections of the file name (disabled) */
-    /*
-    .highlight {
-      background-color: var(--hl-bg);
-      color: var(--hl-fg);
-      padding: 0 3px;
-      border-radius: 2px;
-    }
-    */
     .image-desc {
       margin: 0 0 15px;
-      font-size: 14px;
+      font-size: 15px;
       overflow-wrap: anywhere;
     }
     .image-container {
@@ -174,6 +176,7 @@
   <div id="fileListSection" class="file-list" hidden>
     <ol id="fileList"></ol>
   </div>
+  <div id="fileResizer" class="file-resizer" style="display: none;" title="Drag to resize"></div>
 
   <div class="navigation">
     <button id="prevBtn" onclick="navigate(-1)">←</button>
@@ -190,7 +193,6 @@
 
   <script>
     // ---- Light / dark mode ----
-    // Starts from the OS setting; the button overrides it for this page view.
     const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     function isDark() {
@@ -210,41 +212,41 @@
     darkQuery.addEventListener("change", updateThemeButton);
     updateThemeButton();
 
-    // 1. Image filenames from PNGs.txt, each with its own description
     const imageFiles = [
-      { file: 'PivotTable.png',                                    desc: 'Dummy desc' },
+      { file: 'PivotTable.png',                                    desc: 'PivotTable (Overview)' },
       { file: 'PTTableRange1.png',                                 desc: 'pt.TableRange1.Select' },
       { file: 'PTTableRange2.png',                                 desc: 'pt.TableRange2.Select' },
       { file: 'PTRowRange.png',                                    desc: 'pt.RowRange.Select' },
       { file: 'PTColumnRange.png',                                 desc: 'pt.ColumnRange.Select' },
-      // { file: 'PTCX4_gold_280x233.png',                         desc: 'Dummy desc' },
-      // { file: 'PTCX5_660x82.png',                               desc: 'Dummy desc' },
-      // { file: 'PTCX5_728x90.png',                               desc: 'Dummy desc' },
-      { file: 'PTDataBodyRange.png',                               desc: 'Dummy desc' },
-      { file: 'PTDataLabelRange.png',                              desc: 'Dummy desc' },
-      { file: 'PTPageRange.png',                                   desc: 'Dummy desc' },
-      { file: 'PTPFdatePIfebDataRange.png',                        desc: 'Dummy desc' },
-      { file: 'PTPFyearsDataRange.png',                            desc: 'Dummy desc' },
-      { file: 'PTPFyearsDataRangeA.png',                           desc: 'Dummy desc' },
-      { file: 'PTPFyearsLabelRange.png',                           desc: 'Dummy desc' },
-      { file: 'PTPFyearsPI2004DataRange.png',                      desc: 'Dummy desc' },
-      { file: 'PTPFyearsPI2004DataRangeA.png',                     desc: 'Dummy desc' },
-      { file: 'PTPFyearsPI2004LabelRange.png',                     desc: 'Dummy desc' },
-      { file: 'PTPFyearsPI2004LabelRangeA.png',                    desc: 'pt.PivotFields("Years").PivotItems("2004").LabelRange.Select' },
-      { file: 'PTPFyrsPI2003entirerowINTPForderdatedatarange.png', desc: 'Dummy desc' },
-      { file: 'PTUnionYearsOrderDateDataRange.png',                desc: 'Dummy desc' },
-      { file: 'PT_DataBodyWithoutSubtotals.png',                   desc: 'Dummy desc' },
-      { file: 'PT_Next_Column.png',                                desc: 'Dummy desc' }
+      { file: 'PTDataLabelRange.png',                              desc: 'pt.DataLabelRange.Select' },
+      { file: 'PTDataBodyRange.png',                               desc: 'pt.DataBodyRange.Select' },
+      { file: 'PTPageRange.png',                                   desc: 'pt.PageRange.Select' },
+      { file: 'PTPFyearsLabelRange.png',                           desc: 'pt.PivotFields("Years").LabelRange.Select' },
+      { file: 'PTPFyearsDataRange.png',                            desc: 'pt.PivotFields("Years").DataRange.Select' },
+      { file: 'PTPFyearsPI2004LabelRange.png',                     desc: 'pt.PivotFields("Years").PivotItems("2004").LabelRange.Select' },
+      { file: 'PTPFyearsPI2004DataRange.png',                      desc: 'pt.PivotFields("Years").PivotItems("2004").DataRange.Select' },
+      { file: 'PTPFdatePIfebDataRange.png',                        desc: 'pt.PivotFields("Order Date").PivotItems("Feb").DataRange.Select' },
+      { file: 'PTPFyearsDataRangeA.png',                           desc: 'pt.PivotFields("Years").DataRange.Select (Rows)' },
+      { file: 'PTPFyearsPI2004LabelRangeA.png',                    desc: 'pt.PivotFields("Years").PivotItems("2004").LabelRange.Select (Rows)' },
+      { file: 'PTPFyearsPI2004DataRangeA.png',                     desc: 'pt.PivotFields("Years").PivotItems("2004").DataRange.Select (Rows)' },
+      { file: 'PTPFyrsPI2003entirerowINTPForderdatedatarange.png', desc: 'Intersect(pt.PivotFields(...), pt.PivotFields(...))' },
+      { file: 'PTUnionYearsOrderDateDataRange.png',                desc: 'Union(pt.PivotFields(...), pt.PivotFields(...))' },
+      { file: 'PT_DataBodyWithoutSubtotals.png',                   desc: 'pt.DataBodyRange (Without Subtotals)' },
+      { file: 'PT_Next_Column.png',                                desc: 'pt.DataBodyRange.Offset(0, 1)' }
     ];
 
     let currentIndex = 0;
 
-    // ---- Toggleable file list ----
-    // Each link loads its image into the viewer instead of navigating away.
     function buildFileList() {
       const list = document.getElementById("fileList");
       imageFiles.forEach(({ file, desc }, i) => {
         const li = document.createElement("li");
+        
+        const descSpan = document.createElement("span");
+        descSpan.textContent = desc;
+        
+        const sep = document.createTextNode(" : ");
+        
         const a = document.createElement("a");
         a.href = encodeURIComponent(file);
         a.textContent = file;
@@ -252,8 +254,9 @@
           e.preventDefault();
           loadImage(i);
         });
-        // Plain-text description first, then the clickable filename
-        li.appendChild(document.createTextNode(`${desc}: `));
+
+        li.appendChild(descSpan);
+        li.appendChild(sep);
         li.appendChild(a);
         list.appendChild(li);
       });
@@ -261,13 +264,74 @@
 
     function toggleFileList() {
       const section = document.getElementById("fileListSection");
+      const resizer = document.getElementById("fileResizer");
       const btn = document.getElementById("listToggleBtn");
+      
       section.hidden = !section.hidden;
+      resizer.style.display = section.hidden ? "none" : "block";
+      
       btn.setAttribute("aria-expanded", String(!section.hidden));
       btn.textContent = section.hidden ? "☰ Show file list" : "☰ Hide file list";
     }
 
-    // Helper to pad numbers with leading zeros
+    // ---- Draggable bottom edge functionality ----
+    const fileListSection = document.getElementById("fileListSection");
+    const resizer = document.getElementById("fileResizer");
+    let isDragging = false;
+    let startY = 0;
+    let startHeight = 0;
+
+    resizer.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      startY = e.clientY;
+      startHeight = fileListSection.offsetHeight;
+      document.body.style.cursor = "ns-resize";
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+      e.preventDefault();
+    });
+
+    function onMouseMove(e) {
+      if (!isDragging) return;
+      const deltaY = e.clientY - startY;
+      let newHeight = startHeight + deltaY;
+      if (newHeight < 60) newHeight = 60; // minimum height limit
+      if (newHeight > window.innerHeight * 0.8) newHeight = window.innerHeight * 0.8; // maximum height limit
+      fileListSection.style.height = newHeight + "px";
+    }
+
+    function onMouseUp() {
+      isDragging = false;
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+
+    // Touch support for mobile/tablets
+    resizer.addEventListener("touchstart", (e) => {
+      isDragging = true;
+      startY = e.touches[0].clientY;
+      startHeight = fileListSection.offsetHeight;
+      document.addEventListener("touchmove", onTouchMove);
+      document.addEventListener("touchend", onTouchEnd);
+      e.preventDefault();
+    });
+
+    function onTouchMove(e) {
+      if (!isDragging) return;
+      const deltaY = e.touches[0].clientY - startY;
+      let newHeight = startHeight + deltaY;
+      if (newHeight < 60) newHeight = 60;
+      if (newHeight > window.innerHeight * 0.8) newHeight = window.innerHeight * 0.8;
+      fileListSection.style.height = newHeight + "px";
+    }
+
+    function onTouchEnd() {
+      isDragging = false;
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", onTouchEnd);
+    }
+
     function padNumber(num, total) {
       const digits = total.toString().length;
       return num.toString().padStart(Math.max(2, digits), '0');
@@ -286,32 +350,20 @@
       const { file: currentFile, desc: currentDesc } = imageFiles[currentIndex];
       const encodedFile = encodeURIComponent(currentFile);
 
-      // Format counter string: "03 of 23"
       const totalCount = imageFiles.length;
       const currentNumFormatted = padNumber(currentIndex + 1, totalCount);
       const totalNumFormatted = padNumber(totalCount, totalCount);
-      const counterText = `${currentNumFormatted} of ${totalNumFormatted}`;
 
-      // Highlight dimensions, ID numbers, or specific modifiers if present in the filename (disabled)
-      // const highlightedFile = currentFile.replace(
-      //   /(_\d+x\d+|_gold|\d{4})/g,
-      //   '<span class="highlight">$1</span>'
-      // );
-      // fileLinkElem.innerHTML = `${counterText}: ${highlightedFile}`;
-
-      // Render updated text (no highlighting) and destination link
-      fileLinkElem.textContent = `${counterText}: ${currentFile}`;
+      fileLinkElem.textContent = `${currentNumFormatted} of ${totalNumFormatted}: ${currentFile}`;
       fileLinkElem.setAttribute("href", encodedFile);
 
-      // Show this image's description
-      document.getElementById("imageDesc").textContent = currentDesc;
+      const descElem = document.getElementById("imageDesc");
+      descElem.textContent = currentDesc;
 
-      // Update image source (description doubles as alt text)
       const imgElem = document.getElementById("imageView");
       imgElem.setAttribute("src", encodedFile);
       imgElem.setAttribute("alt", currentDesc);
 
-      // Disable buttons at boundaries
       document.getElementById("prevBtn").disabled = (currentIndex === 0);
       document.getElementById("nextBtn").disabled = (currentIndex === imageFiles.length - 1);
     }
@@ -323,7 +375,6 @@
       }
     }
 
-    // Build the file list and load initial image on page launch
     buildFileList();
     loadImage(0);
   </script>
