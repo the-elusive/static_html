@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I use this to copy characters when they're not easily accessible on my current keyboard</title>
+<style>
+  :root {
+    --hl-red: darkorange;
+    --hl-border: 2px;
+    --hl-cap: 2.25rem;     /* height of the header & footer bars */
+    --hl-speed: 0.3s;      /* collapse / expand animation */
+    --hl-inner-radius: calc(var(--hl-cap) / 2);
+    --hl-side-border: 5px;
+    --hl-eagle: url("https://upload.wikimedia.org/wikipedia/commons/b/b6/Orze%C5%82_Bia%C5%82y_%28Herb_Polski%29.svg");
+    --hl-eagle-veil: rgba(255, 255, 255, 0.2);     /* 0 = no fade; raise towards 1 to fade the eagle */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 1rem;
+    background-color: rgb(72, 61, 139);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-wrap: wrap;            /* textarea drops underneath on narrow windows */
+    align-content: flex-start;  /* keep wrapped rows together - don't spread them down the page */
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* Side by side ("landscape"): text area pushed to the right edge, mirroring the
+     left-hand widgets, with a broken white line down the middle of the screen */
+  body.is-side-by-side { justify-content: space-between; }
+  body.is-side-by-side::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    transform: translateX(-2px);   /* centre the 4px line exactly */
+    /* 16px dashes, 12px gaps - change these to alter the pattern */
+    background: repeating-linear-gradient(to bottom, #fff 0 16px, transparent 16px 28px);
+    pointer-events: none;
+  }
+
+  /* Left column: the three widgets stacked */
+  .hl-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(38rem, 100%);
+  }
+
+  /* Right: the textarea widget - same width as the others; when open it is as tall
+     as the three left-hand widgets collapsed (3 x collapsed height + 2 gaps) */
+  :root { interpolate-size: allow-keywords; }   /* lets height animate to/from auto */
+  .hl-panel--text {
+    height: calc(3 * (2 * var(--hl-cap) + 2 * var(--hl-border)) + 2 * 1rem);
+    display: flex;
+    flex-direction: column;
+    transition: height var(--hl-speed) ease;
+  }
+  .hl-panel--text.is-collapsed { height: auto; }
+  .hl-panel--text .hl-header,
+  .hl-panel--text .hl-footer { flex: none; }
+  .hl-panel--text .hl-body { flex: 1; min-height: 0; }
+
+  /* ---------- Outer widget ---------- */
+  .hl-panel {
+    width: min(38rem, 100%);
+    border: var(--hl-border) solid var(--hl-red);
+    border-left-width: var(--hl-side-border);
+    border-right-width: var(--hl-side-border);
+    border-radius: calc(var(--hl-cap) + var(--hl-border));
+    overflow: hidden;
+    background: var(--hl-red);
+  }
+
+  /* ---------- Header & footer ---------- */
+  .hl-header,
+  .hl-footer {
+    height: var(--hl-cap);
+    background: var(--hl-red);
+  }
+
+  .hl-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 calc(var(--hl-cap) / 2);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.05rem;
+  }
+
+  .hl-title {
+    /* Room for the outline: overflow:hidden (needed for the "…") was clipping it.
+       Padding makes the room; the matching negative margin keeps the title where it was. */
+    padding: 3px;
+    margin: -3px;
+    -webkit-text-stroke: 3px #000;   /* black outline... */
+    paint-order: stroke fill;        /* ...drawn behind the white fill */
+    font-size: inherit;
+    font-weight: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hl-toggle {
+    flex: none;
+    font: inherit;
+    font-size: 0.8rem;
+    color: #000;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 999px;
+    padding: 0.1rem 0.7rem;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
+  }
+  /* Invisible, zero-height copy of the longer label so "Expand" is as wide as "Collapse" */
+  .hl-toggle::after {
+    content: "Collapse";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+  .hl-toggle:hover { background: cyan; color: #000; }
+  .hl-toggle:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+
+  /* ---------- Collapsible body ---------- */
+  .hl-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows var(--hl-speed) ease;
+  }
+  .hl-body-inner {
+    min-height: 0;
+    overflow: hidden;
+    visibility: visible;
+    transition: visibility 0s;
+  }
+  .hl-panel.is-collapsed .hl-body { grid-template-rows: 0fr; }
+  .hl-panel.is-collapsed .hl-body-inner {
+    visibility: hidden;
+    transition: visibility 0s var(--hl-speed);
+  }
+
+  /* White table area with the eagle behind it (white veil keeps text readable) */
+  .hl-scroll {
+    overflow-x: auto;
+    border-radius: var(--hl-inner-radius);
+    background: #fff;
+  }
+  /* Eagle behind the Polish characters table only */
+  .hl-scroll.hl-eagle {
+    background:
+      linear-gradient(var(--hl-eagle-veil), var(--hl-eagle-veil)),
+      var(--hl-eagle) center / contain no-repeat,
+      #fff;
+  }
+
+  /* ---------- Per-widget colour ---------- */
+  .hl-panel--red  { --hl-red: rgb(255, 0, 0); }
+  .hl-panel--gold  { --hl-red: gold; }
+  .hl-panel--green { --hl-red: rgb(0, 255, 0); }
+
+  /* ---------- Textarea widget ---------- */
+  .hl-text-wrap {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.4rem 0.75rem 0.6rem;
+  }
+  .hl-textarea {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #000;
+    background: rgb(192, 192, 192);
+    border: var(--hl-border) solid var(--hl-red);
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    resize: none;            /* height is fixed by the widget */
+  }
+  .hl-textarea:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+  .hl-count {
+    margin: 0 0 0.35rem;
+    font-size: 0.875rem;
+  }
+  .hl-count.is-over { color: red; font-weight: bold; }   /* past Discogs' 500 limit */
+
+  /* Descriptions (characters with no named entity) in the normal font */
+  .hl-rows td .hl-desc {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  /* ---------- Bits n bobs list ---------- */
+  .hl-list {
+    margin: 0;
+    padding: 0.3rem 0.75rem 0.3rem 1.75rem;
+    font-size: 0.875rem;
+  }
+  .hl-list li {
+    padding: 0.35rem 0;
+    line-height: 1.4375rem;   /* = drop-down height, so every item matches the tallest */
+  }
+  .hl-list li::marker { color: var(--hl-red); }
+
+  .hl-select {
+    font: inherit;
+    color: #000;
+    background: #fff;
+    border: var(--hl-border) solid var(--hl-red);
+    border-radius: 0.4rem;
+    padding: 0 0.3rem;
+    margin-left: 0.25rem;
+    vertical-align: top;
+    cursor: pointer;
+  }
+  .hl-select:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+
+  /* ---------- Table ---------- */
+  .hl-table {
+    width: 100%;
+    min-width: 34rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background: transparent;
+  }
+  .hl-table th,
+  .hl-table td {
+    padding: 0.3rem 0.4rem;
+    text-align: left;
+    vertical-align: middle;
+    border: none;
+    border-bottom: var(--hl-border) solid var(--hl-red);
+    background: transparent;
+  }
+
+  .hl-columns th {
+    color: #000;
+    font-weight: bold;
+    font-size: 0.875rem;
+    vertical-align: top;
+  }
+
+  .hl-rows tr:last-child > * { border-bottom: none; }
+
+  .hl-rows td {
+    font-family: ui-monospace, Consolas, "Courier New", monospace;
+    font-size: 0.8rem;
+  }
+
+  /* ---------- Links ---------- */
+  .hl-panel a {
+    color: #000;
+    text-decoration: underline;
+    text-decoration-color: var(--hl-red);
+    text-underline-offset: 2px;
+  }
+  .hl-panel a:hover { color: var(--hl-red); }
+  .hl-panel a:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+
+  /* ---------- Character inputs ---------- */
+  .hl-input {
+    width: 100%;
+    max-width: 2.5rem;
+    font: inherit;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 1.05rem;
+    text-align: center;
+    color: #000;
+    background: #fff;
+    border: var(--hl-border) solid var(--hl-red);
+    border-radius: 0.4rem;
+    padding: 0 0.2rem;
+  }
+  .hl-input:focus-visible { outline: 2px solid #000; outline-offset: 2px; }
+
+  /* Used on page load so widgets start open/closed without animating */
+  .hl-no-anim .hl-panel,
+  .hl-no-anim .hl-body,
+  .hl-no-anim .hl-body-inner { transition: none !important; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hl-panel--text { transition: none; }
+    .hl-body,
+    .hl-body-inner,
+    .hl-panel.is-collapsed .hl-body-inner,
+    .hl-toggle { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="hl-column">
+
+  <section class="hl-panel hl-panel--red" id="bitsPanel">
+
+    <header class="hl-header">
+      <h2 class="hl-title">Bits n bobs</h2>
+      <button type="button" class="hl-toggle" aria-expanded="true" aria-controls="bitsBody">Collapse</button>
+    </header>
+
+    <div class="hl-body" id="bitsBody">
+      <div class="hl-body-inner">
+        <div class="hl-scroll">
+          <ul class="hl-list">
+            <li>
+              <label for="tabSelect">When tabbing select:</label><select class="hl-select" id="tabSelect">
+                <option value="some">some</option>
+                <option value="all">all</option>
+              </select>
+            </li>
+            <li><a href="https://www.w3schools.com/charsets/ref_utf_math.asp" target="_blank" rel="noopener">AWESOME: UTF-8 Math Operators (w3schools)</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Polish_alphabet#Computer_encoding" target="_blank" rel="noopener">Polish characters</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="hl-footer" aria-hidden="true"></footer>
+
+  </section>
+
+  <section class="hl-panel" id="hlPanel">
+
+    <header class="hl-header">
+      <h2 class="hl-title">Polish characters</h2>
+      <button type="button" class="hl-toggle" aria-expanded="true" aria-controls="hlBody">Collapse</button>
+    </header>
+
+    <div class="hl-body" id="hlBody">
+      <div class="hl-body-inner">
+        <div class="hl-scroll hl-eagle">
+          <table class="hl-table">
+            <colgroup>
+              <col style="width: 4.75rem"><col><col><col style="width: 5.25rem">
+              <col style="width: 4.75rem"><col><col><col style="width: 5.25rem">
+            </colgroup>
+            <thead class="hl-columns"></thead>
+            <tbody class="hl-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="hl-footer" aria-hidden="true"></footer>
+
+  </section>
+
+  <section class="hl-panel hl-panel--gold" id="specialPanel">
+
+    <header class="hl-header">
+      <h2 class="hl-title">Special characters</h2>
+      <button type="button" class="hl-toggle" aria-expanded="true" aria-controls="specialBody">Collapse</button>
+    </header>
+
+    <div class="hl-body" id="specialBody">
+      <div class="hl-body-inner">
+        <div class="hl-scroll">
+          <table class="hl-table">
+            <colgroup>
+              <col style="width: 4.75rem"><col style="width: 5.5rem"><col style="width: 6.5rem"><col>
+            </colgroup>
+            <thead class="hl-columns" id="specialHead"></thead>
+            <tbody class="hl-rows" id="specialRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="hl-footer" aria-hidden="true"></footer>
+
+  </section>
+
+  </div>
+
+  <section class="hl-panel hl-panel--green hl-panel--text" id="textPanel">
+
+    <header class="hl-header">
+      <h2 class="hl-title">Text area</h2>
+      <button type="button" class="hl-toggle" aria-expanded="true" aria-controls="textBody">Collapse</button>
+    </header>
+
+    <div class="hl-body" id="textBody">
+      <div class="hl-body-inner">
+        <div class="hl-scroll hl-text-wrap">
+          <p class="hl-count" id="MyParagraph" aria-live="polite"></p>
+          <textarea class="hl-textarea" id="MyTextArea" aria-label="Text area">&#11088;</textarea>
+        </div>
+      </div>
+    </div>
+
+    <footer class="hl-footer" aria-hidden="true"></footer>
+
+  </section>
+
+<script>
+  (function () {
+    /* ---------- Data: one row per letter (upper, lower) ---------- */
+    // code = Unicode code point, entity = HTML named entity, slug = Toptal page name
+    const LETTERS = [
+      { upper: { code: 0x104, entity: 'Aogon',  slug: 'uppercase-a-with-ogonek'  },
+        lower: { code: 0x105, entity: 'aogon',  slug: 'lowercase-a-with-ogonek'  } },
+      { upper: { code: 0x106, entity: 'Cacute', slug: 'uppercase-c-with-acute'   },
+        lower: { code: 0x107, entity: 'cacute', slug: 'lowercase-c-with-acute'   } },
+      { upper: { code: 0x118, entity: 'Eogon',  slug: 'uppercase-e-with-ogonek'  },
+        lower: { code: 0x119, entity: 'eogon',  slug: 'lowercase-e-with-ogonek'  } },
+      { upper: { code: 0x141, entity: 'Lstrok', slug: 'uppercase-l-with-stroke'  },
+        lower: { code: 0x142, entity: 'lstrok', slug: 'lowercase-l-with-stroke'  } },
+      { upper: { code: 0x143, entity: 'Nacute', slug: 'uppercase-n-with-acute'   },
+        lower: { code: 0x144, entity: 'nacute', slug: 'lowercase-n-with-acute'   } },
+      { upper: { code: 0x0D3, entity: 'Oacute', slug: 'uppercase-o-with-acute'   },
+        lower: { code: 0x0F3, entity: 'oacute', slug: 'lowercase-o-with-acute'   } },
+      { upper: { code: 0x15A, entity: 'Sacute', slug: 'uppercase-s-with-acute'   },
+        lower: { code: 0x15B, entity: 'sacute', slug: 'lowercase-s-with-acute'   } },
+      { upper: { code: 0x179, entity: 'Zacute', slug: 'uppercase-z-with-acute'   },
+        lower: { code: 0x17A, entity: 'zacute', slug: 'lowercase-z-with-acute'   } },
+      { upper: { code: 0x17B, entity: 'Zdot',   slug: 'uppercase-z-with-dot-above' },
+        lower: { code: 0x17C, entity: 'zdot',   slug: 'lowercase-z-with-dot-above' } }
+    ];
+
+    /* ---------- Cell builders ---------- */
+    const hex4    = n => n.toString(16).toUpperCase().padStart(4, '0');
+    const compart = n => `https://www.compart.com/en/unicode/U+${hex4(n)}`;
+    const toptal  = s => `https://www.toptal.com/designers/htmlarrows/letters/${s}/`;
+    const link    = (href, text) => `<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
+
+    // "&amp;" so the entity text is shown, not rendered
+    const cells = (c, label) => `
+      <td><input type="text" class="hl-input" value="&${c.entity};" aria-label="${label} character"></td>
+      <td>${link(compart(c.code), `&amp;#${c.code};`)}</td>
+      <td>${link(compart(c.code), `&amp;#x${c.code.toString(16).toUpperCase()};`)}</td>
+      <td>${link(toptal(c.slug), `&amp;${c.entity};`)}</td>`;
+
+    /* ---------- Build table ---------- */
+    const COLUMNS = ['input_u', 'dec_u', 'hex_u', 'entity_u', 'input_l', 'dec_l', 'hex_l', 'entity_l'];
+    document.querySelector('.hl-columns').innerHTML =
+      `<tr>${COLUMNS.map(c => `<th scope="col">${c}</th>`).join('')}</tr>`;
+
+    const tbody = document.querySelector('.hl-rows');
+    tbody.innerHTML = LETTERS.map(l => `
+      <tr>${cells(l.upper, 'Uppercase ' + l.upper.entity)}${cells(l.lower, 'Lowercase ' + l.lower.entity)}</tr>`
+    ).join('');
+
+    /* ---------- Special characters ---------- */
+    // code = decimal code point; entity = named entity if there is one, otherwise
+    // desc = Compart description; toptal = Toptal page (where one exists)
+    const SPECIALS = [
+      { code: 11088,  desc: 'White Medium Star' },
+      { code: 35,     entity: 'num',    toptal: 'punctuation/number-sign' },
+      { code: 124,    entity: 'vert',   toptal: 'punctuation/vertical-bar' },
+      { code: 163,    entity: 'pound',  toptal: 'currency/pound-sign' },
+      { code: 8364,   entity: 'euro',   toptal: 'currency/euro-sign' },
+      { code: 92,     entity: 'bsol',   toptal: 'punctuation/backslash' },
+      { code: 189,    entity: 'frac12', toptal: 'numbers/fraction-one-half' },
+      { code: 8322,   desc: 'Subscript Two',     toptal: 'math/subscript-two' },
+      { code: 178,    entity: 'sup2',   toptal: 'math/superscript-two' },
+      { code: 8592,   entity: 'larr',   toptal: 'arrows/left-arrow' },
+      { code: 8593,   entity: 'uarr',   toptal: 'arrows/up-arrow' },
+      { code: 8594,   entity: 'rarr',   toptal: 'arrows/right-arrow' },
+      { code: 8595,   entity: 'darr',   toptal: 'arrows/down-arrow' },
+      { code: 8734,   entity: 'infin',  toptal: 'math/infinity' },
+      { code: 247,    entity: 'divide', toptal: 'math/division-sign' },
+      { code: 215,    entity: 'times',  toptal: 'math/multiplication-sign' },
+      { code: 8756,   entity: 'there4', toptal: 'math/therefore' },
+      { code: 126,    desc: 'Tilde',    toptal: 'punctuation/tilde' },   // &tilde; would give ˜ (U+02DC), not ~
+      { code: 172,    entity: 'not',    toptal: 'math/not-sign' },
+      { code: 119909, desc: 'Mathematical Italic Small X' },
+      { code: 119910, desc: 'Mathematical Italic Small Y' },
+      { code: 8800,   entity: 'ne',     toptal: 'math/not-equal-to-sign' },
+      { code: 8451,   desc: 'Degree Celsius',    toptal: 'symbols/degree-celsius' },
+      { code: 8457,   desc: 'Degree Fahrenheit', toptal: 'symbols/degree-fahrenheit' },
+      { code: 128077, desc: 'Thumbs Up Sign' },
+      { code: 128031, desc: 'Fish' },
+      { code: 60,     entity: 'lt',     toptal: 'math/less-than-sign' },
+      { code: 62,     entity: 'gt',     toptal: 'math/greater-than-sign' },
+      { code: 129318, desc: 'Face Palm' }
+    ];
+
+    const toptalPage = p => `https://www.toptal.com/designers/htmlarrows/${p}/`;
+
+    document.getElementById('specialHead').innerHTML =
+      `<tr>${['Input', 'Dec', 'Hex', 'Entity'].map(c => `<th scope="col">${c}</th>`).join('')}</tr>`;
+
+    document.getElementById('specialRows').innerHTML = SPECIALS.map(c => {
+      const label = c.entity ? `&amp;${c.entity};` : `<span class="hl-desc">${c.desc}</span>`;
+      return `
+      <tr>
+        <td><input type="text" class="hl-input" value="&#${c.code};" aria-label="${c.entity || c.desc} character"></td>
+        <td>${link(compart(c.code), `&amp;#${c.code};`)}</td>
+        <td>${link(compart(c.code), `&amp;#x${c.code.toString(16).toUpperCase()};`)}</td>
+        <td>${c.toptal ? link(toptalPage(c.toptal), label) : label}</td>
+      </tr>`;
+    }).join('');
+
+    // Click (or tab into) any input to select its character, ready to copy
+    document.addEventListener('focusin', e => {
+      if (e.target.matches('.hl-input')) e.target.select();
+    });
+
+    /* ---------- Tab mode: "some" = Tab/Shift+Tab hop between input boxes only ---------- */
+    const tabMode = document.getElementById('tabSelect');
+
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (tabMode.value !== 'some') return;            // "all" = normal browser tabbing
+
+      // Skip boxes hidden by a collapsed widget
+      const inputs = [...document.querySelectorAll('.hl-input')]
+        .filter(el => el.checkVisibility({ visibilityProperty: true }));
+      if (!inputs.length) return;
+
+      e.preventDefault();
+      const cur = document.activeElement;
+      let target;
+      if (e.shiftKey) {
+        const before = inputs.filter(el => el.compareDocumentPosition(cur) & Node.DOCUMENT_POSITION_FOLLOWING);
+        target = before.length ? before[before.length - 1] : inputs[inputs.length - 1];   // wrap to last
+      } else {
+        const after = inputs.filter(el => cur.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING);
+        target = after[0] || inputs[0];                                                    // wrap to first
+      }
+      target.focus();
+    });
+
+    /* ---------- Textarea character count ---------- */
+    const DISCOGS_MAX = 500;
+    const textArea  = document.getElementById('MyTextArea');
+    const textCount = document.getElementById('MyParagraph');
+    function updateCount() {
+      const n = textArea.value.length;
+      textCount.textContent = `Length: ${n}. Max chars in Discogs' condition comments box is ${DISCOGS_MAX}.`;
+      textCount.classList.toggle('is-over', n > DISCOGS_MAX);
+    }
+    textArea.addEventListener('input', updateCount);
+    updateCount();
+
+    /* ---------- Collapse / expand ---------- */
+    function setCollapsed(panel, collapsed) {
+      const toggle = panel.querySelector('.hl-toggle');
+      panel.classList.toggle('is-collapsed', collapsed);
+      toggle.textContent = collapsed ? 'Expand' : 'Collapse';
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+    }
+
+    const panels = [...document.querySelectorAll('.hl-panel')];
+    panels.forEach(panel => {
+      panel.querySelector('.hl-toggle').addEventListener('click', () =>
+        setCollapsed(panel, !panel.classList.contains('is-collapsed')));
+    });
+
+    /* ---------- Starting layout ----------
+       Text area beside the widgets -> three widgets closed, text area open.
+       Text area wrapped underneath  -> everything closed.
+       Re-applied only when the layout switches between the two (e.g. resizing
+       the window), so your own expand/collapse clicks aren't undone. */
+    const textPanel  = document.getElementById('textPanel');
+    const firstPanel = document.getElementById('bitsPanel');
+    let lastLayout = null;
+
+    function applyLayout(animate) {
+      const below = textPanel.getBoundingClientRect().top > firstPanel.getBoundingClientRect().top + 1;
+      const layout = below ? 'stacked' : 'side-by-side';
+      document.body.classList.toggle('is-side-by-side', !below);
+      if (layout === lastLayout) return;
+      lastLayout = layout;
+      if (!animate) document.body.classList.add('hl-no-anim');
+      panels.forEach(panel => setCollapsed(panel, below || panel !== textPanel));
+      if (!animate) requestAnimationFrame(() => requestAnimationFrame(() =>
+        document.body.classList.remove('hl-no-anim')));
+    }
+
+    applyLayout(false);                                   // on page load: no animation
+    window.addEventListener('resize', () => applyLayout(true));
+  })();
+</script>
+
+</body>
+</html>
